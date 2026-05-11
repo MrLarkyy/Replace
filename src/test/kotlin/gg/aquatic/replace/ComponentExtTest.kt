@@ -30,4 +30,26 @@ class ComponentExtTest {
 
         assertEquals(setOf("player", "server"), placeholders)
     }
+
+    @Test
+    fun `test cached placeholder replacement uses placeholder names`() {
+        val component = Component.text("Welcome %player% to %server%!")
+        val replaced = component.replacePlaceholders(
+            mapOf(
+                "player" to "Larkyy",
+                "server" to "Cosmo",
+            ),
+        )
+
+        assertEquals("Welcome Larkyy to Cosmo!", (replaced as TextComponent).content())
+    }
+
+    @Test
+    fun `test cached placeholder replacement updates insertion`() {
+        val component = Component.text("Open")
+            .insertion("profile:%player%")
+        val replaced = component.replacePlaceholders(mapOf("player" to "Larkyy"))
+
+        assertEquals("profile:Larkyy", replaced.insertion())
+    }
 }

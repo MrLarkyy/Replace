@@ -63,7 +63,11 @@ private fun Component.applyToStyle(updater: (String) -> String): Style {
             newStyle = newStyle.hoverEvent(HoverEvent.showText(replacedHover))
         }
     }
-    style().insertion()?.let { newStyle = newStyle.insertion(updater(it)) }
+    style().insertion()?.let { insertion ->
+        newStyle = newStyle.insertion(
+            PLACEHOLDER_REGEX.replace(insertion) { updater(it.groupValues[1]) },
+        )
+    }
     return newStyle
 }
 
@@ -71,12 +75,7 @@ private fun Component.applyToStyle(updater: (String) -> String): Style {
  * Only use when we 100% know that we got predefined placeholders
  */
 fun Component.replacePlaceholders(cached: Map<String, String>): Component {
-    return replacePlaceholders { text ->
-        PLACEHOLDER_REGEX.replace(text) { match ->
-            val key = match.groupValues[1]
-            cached[key] ?: key
-        }
-    }
+    return replacePlaceholders { placeholder -> cached[placeholder] ?: "%$placeholder%" }
 }
 
 /**
